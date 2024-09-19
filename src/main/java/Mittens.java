@@ -94,16 +94,26 @@ public class Mittens {
     }
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
         try {
             taskList = storage.load();
+        } catch (StorageFileException e) {
+            e.echo();
+            
+            System.out.print("Would you like to continue with a new list instead? (y/n)\n> ");
+            String input = scanner.nextLine();
+            if (input.equals("y")) {
+                taskList = new TaskList();
+            } else {
+                return;
+            }
         } catch (Exception e) {
-            UnknownException newException = new UnknownException(e.getMessage());
+            InitializationException newException = new InitializationException(e.getMessage());
             newException.echo();
-            taskList = new TaskList();
+            return;
         }
         
-        Scanner scanner = new Scanner(System.in);
-
         greet();
 
         while (true) {
