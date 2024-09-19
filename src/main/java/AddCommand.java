@@ -11,14 +11,14 @@ public class AddCommand extends Command<Task> {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         try {
-            tasks.addTask(toAdd);
-            this.result = toAdd;
+            tasks.addTask(this.toAdd);
+            this.result = this.toAdd;
             
             storage.save(tasks);
             
             List<String> messages = new ArrayList<String>();
             messages.add("I've added \"%s\" to your list :3"
-                    .formatted(toAdd.getDescription()));
+                    .formatted(this.result.getDescription()));
             ui.showRegularMessage(messages);
         } catch (MittensException e) {
             ui.showErrorMessage(e);
