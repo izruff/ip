@@ -63,7 +63,7 @@ public class TextUi extends Ui {
     }
 
     @Override
-    public void showCommandCompletion(Command c) {
+    public <T> void showCommandCompletion(Command<T> c) {
         // TODO
     }
 
