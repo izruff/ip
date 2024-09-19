@@ -61,14 +61,20 @@ public class TextUi extends Ui {
 
         this.out.println(uiMessage);
     }
-    
-    public void printErrorMessage(MittensException e) {
+
+    @Override
+    public void showCommandCompletion(Command c) {
+        // TODO
+    }
+
+    @Override
+    public void showError(MittensException e) {
         String mittensMessage = e.getMittensMessage();
         int len = mittensMessage.length();
-        
+
         String helpMessage = e.getHelpMessage();
         String errorMessage = e.getMessage();
-        
+
         String uiMessage = """
                  /\\_/\\     %s
                  >x.x<    ( %s )
@@ -82,7 +88,8 @@ public class TextUi extends Ui {
 
         this.out.println(uiMessage);
     }
-    
+
+    @Override
     public String getUserInput() {
         this.out.print("> ");
         return this.in.nextLine();
