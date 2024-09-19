@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -56,37 +57,42 @@ public class Mittens {
             return;
         }
         System.out.printf("\nYou have %d tasks in your list, here they are :3\n", taskList.getCount());
-        for (int i = 0; i < taskList.getCount(); i++) {
-            Task task = taskList.getTask(i);
+        List<Task> tasks = taskList.getTasks();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
             System.out.printf("%d. %s\n", i + 1, task.toString());
         }
         System.out.print("\n");
     }
 
     public static void markTaskAsDone(int index) throws BadInputException {
-        if (index > taskList.getCount()) {
+        try {
+            Task task = taskList.markTaskAsDone(index - 1);
+            System.out.printf("\nMeow, I scratched the check box for you:\n%s\n\n", task.toString());
+        } catch (IndexOutOfBoundsException e) {
+            // TODO: Define custom exceptions for TaskList operations
             throw new BadInputException("Task index is out of range");
         }
-        Task task = taskList.getTask(index - 1);
-        task.markAsDone();
-        System.out.printf("\nMeow, I scratched the check box for you:\n%s\n\n", task.toString());
     }
 
     public static void markTaskAsNotDone(int index) throws BadInputException {
-        if (index > taskList.getCount()) {
+        try {
+            Task task = taskList.markTaskAsNotDone(index - 1);
+            System.out.printf("\nMeow, I unscratched the check box for you:\n%s\n\n", task.toString());
+        } catch (IndexOutOfBoundsException e) {
+            // TODO: Define custom exceptions for TaskList operations
             throw new BadInputException("Task index is out of range");
         }
-        Task task = taskList.getTask(index - 1);
-        task.markAsNotDone();
-        System.out.printf("\nMeow, I unscratched the check box for you:\n%s\n\n", task.toString());
     }
     
     public static void deleteTask(int index) throws BadInputException {
-        if (index > taskList.getCount()) {
+        try {
+            Task task = taskList.deleteTask(index - 1);
+            System.out.printf("\nMeow, I deleted the task '%s' for you :3\n\n", task.getDescription());
+        } catch (IndexOutOfBoundsException e) {
+            // TODO: Define custom exceptions for TaskList operations
             throw new BadInputException("Task index is out of range");
         }
-        Task task = taskList.removeTask(index - 1);
-        System.out.printf("\nMeow, I deleted the task '%s' for you :3\n\n", task.getDescription());
     }
 
     public static void exit() {
