@@ -2,7 +2,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-public class TextUi {
+public class TextUi extends Ui {
     private final static String GREETING_MESSAGE = """
              /\\_/\\     ____________________
              >^,^<    / Hi, I'm Mittens!   \\
