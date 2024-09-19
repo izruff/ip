@@ -96,6 +96,13 @@ public class TextUi extends Ui {
     }
     
     @Override
+    public void showRegularMessage(String message) {
+        this.printBlankLine();
+        this.printMessage(message);
+        this.printBlankLine();
+    }
+    
+    @Override
     public void showMittensMessage(List<String> messages) {
         this.printBlankLine();
         for (String message : messages) {

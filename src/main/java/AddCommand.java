@@ -16,10 +16,8 @@ public class AddCommand extends Command<Task> {
             
             storage.save(tasks);
             
-            List<String> messages = new ArrayList<String>();
-            messages.add("I've added \"%s\" to your list :3"
+            ui.showRegularMessage("I've added \"%s\" to your list :3"
                     .formatted(this.result.getDescription()));
-            ui.showRegularMessage(messages);
         } catch (MittensException e) {
             ui.showErrorMessage(e);
         }
