@@ -25,14 +25,21 @@ public class Mittens {
             """;
     
     
-    private final static Storage storage = new Storage("data/data.txt");
-    private static TaskList taskList;
+    private Ui ui;
+    private Storage storage;
+    private TaskList taskList;
     
-    public static void greet() {
+    public Mittens(String storageFilePath) {
+        this.ui = new TextUi();
+        this.storage = new Storage(storageFilePath);
+        this.taskList = new TaskList();
+    }
+    
+    public void greet() {
         System.out.println(GREETING_MESSAGE);
     }
 
-    public static void echo(String command) {
+    public void echo(String command) {
         int len = command.length();
         String message = """
                 
@@ -46,18 +53,18 @@ public class Mittens {
         System.out.println(message);
     }
 
-    public static void addTask(Task task) {
-        taskList.addTask(task);
+    public void addTask(Task task) {
+        this.taskList.addTask(task);
         System.out.printf("\nI've added \"%s\" to your list :3\n\n", task.getDescription());
     }
 
-    public static void listTasks() {
-        if (taskList.getCount() == 0) {
+    public void listTasks() {
+        if (this.taskList.getCount() == 0) {
             System.out.println("\nMeow?! Your list is empty!\n");
             return;
         }
-        System.out.printf("\nYou have %d tasks in your list, here they are :3\n", taskList.getCount());
-        List<Task> tasks = taskList.getTasks();
+        System.out.printf("\nYou have %d tasks in your list, here they are :3\n", this.taskList.getCount());
+        List<Task> tasks = this.taskList.getTasks();
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             System.out.printf("%d. %s\n", i + 1, task.toString());
@@ -65,9 +72,9 @@ public class Mittens {
         System.out.print("\n");
     }
 
-    public static void markTaskAsDone(int index) throws BadInputException {
+    public void markTaskAsDone(int index) throws BadInputException {
         try {
-            Task task = taskList.markTaskAsDone(index - 1);
+            Task task = this.taskList.markTaskAsDone(index - 1);
             System.out.printf("\nMeow, I scratched the check box for you:\n%s\n\n", task.toString());
         } catch (IndexOutOfBoundsException e) {
             // TODO: Define custom exceptions for TaskList operations
@@ -75,9 +82,9 @@ public class Mittens {
         }
     }
 
-    public static void markTaskAsNotDone(int index) throws BadInputException {
+    public void markTaskAsNotDone(int index) throws BadInputException {
         try {
-            Task task = taskList.markTaskAsNotDone(index - 1);
+            Task task = this.taskList.markTaskAsNotDone(index - 1);
             System.out.printf("\nMeow, I unscratched the check box for you:\n%s\n\n", task.toString());
         } catch (IndexOutOfBoundsException e) {
             // TODO: Define custom exceptions for TaskList operations
@@ -85,9 +92,9 @@ public class Mittens {
         }
     }
     
-    public static void deleteTask(int index) throws BadInputException {
+    public void deleteTask(int index) throws BadInputException {
         try {
-            Task task = taskList.deleteTask(index - 1);
+            Task task = this.taskList.deleteTask(index - 1);
             System.out.printf("\nMeow, I deleted the task '%s' for you :3\n\n", task.getDescription());
         } catch (IndexOutOfBoundsException e) {
             // TODO: Define custom exceptions for TaskList operations
@@ -99,18 +106,18 @@ public class Mittens {
         System.out.println(EXIT_MESSAGE);
     }
 
-    public static void main(String[] args) {
+    public void run() {
         Scanner scanner = new Scanner(System.in);
         
         try {
-            taskList = storage.load();
+            this.taskList = this.storage.load();
         } catch (StorageFileException e) {
             e.echo();
             
             System.out.print("Would you like to continue with a new list instead? (y/n)\n> ");
             String input = scanner.nextLine();
             if (input.equals("y")) {
-                taskList = new TaskList();
+                this.taskList = new TaskList();
             } else {
                 return;
             }
@@ -156,7 +163,8 @@ public class Mittens {
                     String description = input.substring(5);
 
                     Todo newTodo = new Todo(description);
-                    addTask(newTodo);
+                    AddCommand command = new AddCommand(newTodo);
+                    command.execute(this.taskList, this.ui, this.storage);
                 } else if (input.startsWith("deadline")) {
                     // Separate the inputs so that the first element contains the description while
                     // the rest contains flags.
@@ -186,7 +194,8 @@ public class Mittens {
                     }
 
                     Deadline newDeadline = new Deadline(description, by);
-                    addTask(newDeadline);
+                    AddCommand command = new AddCommand(newDeadline);
+                    command.execute(this.taskList, this.ui, this.storage);
                 } else if (input.startsWith("event")) {
                     // Separate the inputs so that the first element contains the description while
                     // the rest contains flags.
@@ -231,9 +240,10 @@ public class Mittens {
                     }
 
                     Event newEvent = new Event(description, from, to);
-                    addTask(newEvent);
+                    AddCommand command = new AddCommand(newEvent);
+                    command.execute(this.taskList, this.ui, this.storage);
                 } else if (input.equals("save")) {
-                    storage.save(taskList);
+                    this.storage.save(this.taskList);
                 } else {
                     throw new BadInputException("'%s' is not a known command".formatted(input));
                 }
@@ -246,5 +256,10 @@ public class Mittens {
         }
 
         exit();
+    }
+    
+    public static void main(String[] args) {
+        Mittens mittens = new Mittens("data/data.txt");
+        mittens.run();
     }
 }
