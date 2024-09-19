@@ -12,7 +12,7 @@ public class Storage {
         this.filePath = Path.of(filePath);
     }
     
-    public void save(TaskList taskList) throws IOException {
+    public void save(TaskList taskList) throws StorageFileException {
         try {
             ArrayList<String> encodedTasks = new ArrayList<>();
             for (Task task : taskList.tasks) {
@@ -37,14 +37,18 @@ public class Storage {
             }
             Files.write(this.filePath, encodedTasks, java.nio.file.StandardOpenOption.CREATE);
         } catch (IOException e) {
-            System.out.println(e);
-            throw e;
+            throw new StorageFileException("Unable to write to storage file");
         }
     }
     
-    public TaskList load() throws IOException {
+    public TaskList load() throws StorageFileException {
         if (!Files.exists(this.filePath)) {
-            Files.createFile(this.filePath);
+            try {
+                Files.createDirectories(this.filePath.getParent());
+                Files.createFile(this.filePath);
+            } catch (IOException e) {
+                throw new StorageFileException("Unable to create storage file");
+            }
             return new TaskList();
         }
         
@@ -66,7 +70,7 @@ public class Storage {
                                 LocalDate.parse(taskComponents[4]));
                         break;
                     default:
-                        break;
+                        throw new StorageFileException("Corrupted storage file");
                 }
                 if (taskComponents[1].equals("1")) {
                     task.markAsDone();
@@ -75,12 +79,9 @@ public class Storage {
             }
             return taskList;
         } catch (IOException e) {
-            System.out.println(e);
-            throw e;
+            throw new StorageFileException("Unable to read from storage file");
         } catch (DateTimeParseException e) {
-            // TODO: Handle this exception
-            System.out.println(e);
-            throw e;
+            throw new StorageFileException("Corrupted storage file");
         }
     }
 }
